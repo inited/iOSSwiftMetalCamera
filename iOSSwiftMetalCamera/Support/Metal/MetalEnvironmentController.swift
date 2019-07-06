@@ -46,7 +46,7 @@ class MetalEnvironmentController: NSObject {
 	------------------------------------------*/
 	
 	private func _setupProjectionMatrix() {
-		projectionMatrix = Matrix4.makePerspectiveViewAngle(Matrix4.degreesToRad(85.0), aspectRatio: Float(view.bounds.size.width / view.bounds.size.height), nearZ: 0.1, farZ: 100.0)
+        projectionMatrix = Matrix4.makePerspectiveViewAngle(Matrix4.degrees(toRad: 85.0), aspectRatio: Float(view.bounds.size.width / view.bounds.size.height), nearZ: 0.1, farZ: 100.0)
 	}
 	
 	private func _setupMetalLayer() {
@@ -54,7 +54,7 @@ class MetalEnvironmentController: NSObject {
 		metalLayer.device = device
 		// Set pixel format. 8 bytes for Blue, Green, Red, and Alpha, in that order
 		//   with normalized values between 0 and 1
-		metalLayer.pixelFormat = .BGRA8Unorm
+        metalLayer.pixelFormat = .bgra8Unorm
 		metalLayer.framebufferOnly = false
 		metalLayer.frame = view.layer.frame
 		view.layer.addSublayer(metalLayer)
@@ -62,36 +62,36 @@ class MetalEnvironmentController: NSObject {
 	
 	private func _createCommandQueue() {
 		// A queue of commands for GPU to execute.
-		commandQueue = device.newCommandQueue()
+        commandQueue = device.makeCommandQueue()
 	}
 	
 	private func _createDisplayLink() {
 		// Call gameloop() on every screen refresh.
-		timer = CADisplayLink(target: self, selector: Selector("gameloop:"))
-		timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        timer = CADisplayLink(target: self, selector: #selector(MetalEnvironmentController.gameloop))
+        timer.add(to: RunLoop.main, forMode: RunLoop.Mode.default)
 	}
 	
 	private func _render() {
-		var drawable = metalLayer.nextDrawable()
+        let drawable = metalLayer.nextDrawable()
 		worldModelMatrix = Matrix4()
 		// If we want to move our 'camera', here is a good spot to do so.
 		worldModelMatrix!.translate(0.0, y: 0.0, z: 0.0)
-		worldModelMatrix!.rotateAroundX(Matrix4.degreesToRad(cameraXAngle), y: Matrix4.degreesToRad(cameraYAngle), z: 0.0)
+        worldModelMatrix!.rotateAroundX(Matrix4.degrees(toRad: cameraXAngle), y: Matrix4.degrees(toRad: cameraYAngle), z: 0.0)
 		
 		
 		// Get commandBuffer from queue, request descriptor for this object from delegate, and encode.
-		let commandBuffer = commandQueue.commandBuffer()
+        let commandBuffer = commandQueue.makeCommandBuffer()
 		
 		// Enumerate over scene objects and render.
 		if (sceneObjects.count > 0) {
-			for (index, objectToDraw) in enumerate(sceneObjects) {
-				objectToDraw.render(commandBuffer, drawable: drawable)
+			for (index, objectToDraw) in sceneObjects.enumerated() {
+                objectToDraw.render(commandBuffer: commandBuffer!, drawable: drawable!)
 			}
 		}
 		
 		// Teardown and Commit
-		commandBuffer.presentDrawable(drawable)
-		commandBuffer.commit()
+        commandBuffer!.present(drawable!)
+        commandBuffer!.commit()
 	}
 	
 	private func _makeOrthographicMatrix() -> [Float] {
@@ -123,7 +123,7 @@ class MetalEnvironmentController: NSObject {
 		_createDisplayLink()
 	}
  
-	func gameloop(displayLink: CADisplayLink) {
+	@objc func gameloop(displayLink: CADisplayLink) {
 		autoreleasepool {
 			self._render()
 		}
@@ -134,18 +134,18 @@ class MetalEnvironmentController: NSObject {
 	}
 	
 	
-	func generateMipmapsAcceleratedFromTexture(texture: MTLTexture, toTexture: MTLTexture, completionBlock:(texture: MTLTexture) -> Void) {
-		let commandBuffer = commandQueue.commandBuffer()
-		let commandEncoder = commandBuffer?.blitCommandEncoder()
+    func generateMipmapsAcceleratedFromTexture(texture: MTLTexture, toTexture: MTLTexture, completionBlock:@escaping (_ texture: MTLTexture) -> Void) {
+        let commandBuffer = commandQueue.makeCommandBuffer()
+        let commandEncoder = commandBuffer?.makeBlitCommandEncoder()
 		let origin = MTLOriginMake(0, 0, 0)
 		let size = MTLSizeMake(texture.width, texture.height, 1)
 
-		commandEncoder?.copyFromTexture(texture, sourceSlice: 0, sourceLevel: 0, sourceOrigin: origin, sourceSize: size, toTexture: toTexture, destinationSlice: 0, destinationLevel: 0, destinationOrigin: origin)
+        commandEncoder?.copy(from: texture, sourceSlice: 0, sourceLevel: 0, sourceOrigin: origin, sourceSize: size, to: toTexture, destinationSlice: 0, destinationLevel: 0, destinationOrigin: origin)
 		
-		commandEncoder?.generateMipmapsForTexture(toTexture)
+        commandEncoder?.generateMipmaps(for: toTexture)
 		commandEncoder?.endEncoding()
 		commandBuffer?.addCompletedHandler({ (MTLCommandBuffer) -> Void in
-			completionBlock(texture: texture)
+            completionBlock(texture)
 		})
 		commandBuffer?.commit()
 	}

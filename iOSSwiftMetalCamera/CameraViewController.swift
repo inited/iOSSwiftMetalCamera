@@ -29,10 +29,10 @@ class CameraViewController: UIViewController, CameraSessionControllerDelegate {
 		cameraSessionController = CameraSessionController()
 		cameraSessionController.sessionDelegate = self
 		
-		shaderToggler!.on = false
+        shaderToggler!.isOn = false
 	}
 	
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
 		cameraSessionController.startCamera()
@@ -51,35 +51,29 @@ class CameraViewController: UIViewController, CameraSessionControllerDelegate {
 	func setupPreviewLayer() {
 		self.previewLayer = AVCaptureVideoPreviewLayer(session: self.cameraSessionController.session)
 		self.previewLayer.bounds = self.view.bounds
-		self.previewLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds))
-		self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-		self.previewLayer.backgroundColor = UIColor.blackColor().CGColor // UNNECESSARY PROBABLY
+        self.previewLayer.position = CGPoint(x: self.view.bounds.midX, y: self.view.bounds.midY)
+        self.previewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        self.previewLayer.backgroundColor = UIColor.black.cgColor // UNNECESSARY PROBABLY
 		self.view.layer.addSublayer(self.previewLayer)
 	}
 	
 	func setupShaderView() {
 		var rect: CGRect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: view.bounds.width, height: view.bounds.height))
 		cameraView = MetalCameraView(frame: view.bounds)
-		view.insertSubview(cameraView, atIndex: 0)
+        view.insertSubview(cameraView, at: 0)
 	}
 	
-	@IBAction func toggleShader(sender: AnyObject) {
-		cameraView?.toggleShader(shaderToggler!.on)
+	@objc func toggleShader(_ sender: AnyObject) {
+        cameraView?.toggleShader(shouldShowShader: shaderToggler!.isOn)
 	}
 	
 	
 	/* Delegate Methods
 	------------------------------------------*/
 	
-	func cameraSessionDidOutputSampleBuffer(sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
-		if (connection.supportsVideoOrientation) {
-			connection.videoOrientation = AVCaptureVideoOrientation.Portrait
-		}
-		if (connection.supportsVideoMirroring) {
-			connection.videoMirrored = true
-		}
+	func cameraSessionDidOutputSampleBuffer(sampleBuffer: CMSampleBuffer!) {
 		
-		cameraView.updateTextureFromSampleBuffer(sampleBuffer)
+        cameraView.updateTextureFromSampleBuffer(sampleBuffer: sampleBuffer)
 	}
 
 }

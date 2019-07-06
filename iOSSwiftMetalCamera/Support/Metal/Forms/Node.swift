@@ -51,13 +51,13 @@ class Node: NSObject {
 			vertexData += vertex.floatBuffer()
 		}
 		
-		let dataSize = vertexData.count * sizeofValue(vertexData[0])
+		let dataSize = vertexData.count * MemoryLayout.size(ofValue: vertexData[0])
 		
 		self.name = name
 		self.device = device
 		vertexCount = vertices.count
-		vertexBuffer = device.newBufferWithBytes(vertexData, length: dataSize, options: nil)
-		uniformsBuffer = device.newBufferWithLength(sizeof(Float)*16*2, options: nil)
+        vertexBuffer = device.makeBuffer(bytes: vertexData, length: dataSize, options: [])!
+        uniformsBuffer = device.makeBuffer(length: MemoryLayout<Float>.size*16*2, options: [])
 		super.init()
 	}
 	
@@ -69,25 +69,25 @@ class Node: NSObject {
 		
 		// This class is simply a base class for all scene objects to inherit from. The way these objects are rendered is the concern 
 		//   the object that creates them. Therefore, we delegate out this task.
-		delegate?.configureCommandBuffer(commandBuffer, node: self, drawable: drawable)
+        delegate?.configureCommandBuffer(commandBuffer: commandBuffer, node: self, drawable: drawable)
 	}
 	
 	func modelMatrix() -> Matrix4 {
-		var matrix = Matrix4()
-		matrix.translate(positionX, y: positionY, z: positionZ)
-		matrix.rotateAroundX(rotationX, y: rotationY, z: rotationZ)
-		matrix.scale(scaleX, y: scaleY, z: scaleZ)
-		return matrix
+        let matrix = Matrix4()
+        matrix!.translate(positionX, y: positionY, z: positionZ)
+        matrix!.rotateAroundX(rotationX, y: rotationY, z: rotationZ)
+        matrix!.scale(scaleX, y: scaleY, z: scaleZ)
+        return matrix!
 	}
 	
 	func sceneAdjustedUniformsBufferForworldModelMatrix(worldModelMatrix: Matrix4, projectionMatrix: Matrix4) -> MTLBuffer {
-		var nodeModelMatrix: Matrix4 = modelMatrix()
+        let nodeModelMatrix: Matrix4 = modelMatrix()
 		nodeModelMatrix.multiplyLeft(worldModelMatrix)
 		// Get a raw pointer from buffer.
-		var bufferPointer = uniformsBuffer?.contents()
+        let bufferPointer = uniformsBuffer?.contents()
 		// Copy your matrix data into the buffer
-		memcpy(bufferPointer!, nodeModelMatrix.raw(), UInt(sizeof(Float)*16))
-		memcpy(bufferPointer! + sizeof(Float)*16, projectionMatrix.raw(), UInt(sizeof(Float)*16))
+        memcpy(bufferPointer!, nodeModelMatrix.raw(), MemoryLayout<Float>.size*16)
+        memcpy(bufferPointer! + MemoryLayout<Float>.size*16, projectionMatrix.raw(), MemoryLayout<Float>.size*16)
 		
 		return uniformsBuffer!
 	}

@@ -109,6 +109,9 @@
 			isa = PBXGroup;
 			children = (
 				AD1673D61A27E33E0046F347 /* AppDelegate.swift */,
+				AD1673DB1A27E33E0046F347 /* CameraViewController.swift */,
+				AD1674031A27EAEB0046F347 /* CameraSessionController.swift */,
+				ADD7FDCC1A536841006536A6 /* MetalCameraView.swift */,
 				AD6378131A2BF5A400E631CA /* Support */,
 				AD6378161A2BF5F200E631CA /* Views */,
 				AD6378151A2BF5EA00E631CA /* Controllers */,
@@ -169,7 +172,6 @@
 		AD6378151A2BF5EA00E631CA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				AD1673DB1A27E33E0046F347 /* CameraViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -179,7 +181,6 @@
 			children = (
 				AD1673E21A27E33E0046F347 /* LaunchScreen.xib */,
 				AD1673DD1A27E33E0046F347 /* Main.storyboard */,
-				ADD7FDCC1A536841006536A6 /* MetalCameraView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -187,7 +188,6 @@
 		AD6378171A2BF64100E631CA /* Camera */ = {
 			isa = PBXGroup;
 			children = (
-				AD1674031A27EAEB0046F347 /* CameraSessionController.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -265,6 +265,7 @@
 				TargetAttributes = {
 					AD1673D01A27E33E0046F347 = {
 						CreatedOnToolsVersion = 6.1;
+						ProvisioningStyle = Automatic;
 					};
 					AD1673E81A27E33E0046F347 = {
 						CreatedOnToolsVersion = 6.1;
@@ -277,6 +278,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -458,10 +460,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = iOSSwiftMetalCamera/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSSwiftMetalCamera-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -469,10 +478,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = iOSSwiftMetalCamera/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSSwiftMetalCamera-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
